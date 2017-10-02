@@ -4,7 +4,6 @@
 *.log
 *.nav
 *.out
-*.pdf
 *.snm
 *.synctex.gz
 *.toc
@@ -31,3 +30,4 @@ apr/
 apr-util/
 apache-log4cxx/
 jsoncpp/
+web/

@@ -1,8 +1,11 @@
-[![Build Status](https://travis-ci.org/DQM4HEP/DQM4HEP.svg?branch=master)](https://travis-ci.org/DQM4HEP/DQM4HEP)
+[![Build Status](https://travis-ci.org/DQM4HEP/dqm4hep.svg?branch=master)](https://travis-ci.org/DQM4HEP/dqm4hep)
+[![Coverity Scan](https://scan.coverity.com/projects/13354/badge.svg)](https://scan.coverity.com/projects/dqm4hep-dqm4hep)
 
 # DQM4HEP
 # A Data Quality Monitoring for High Energy Physics
-Copyright IPNL/CNRS/IN2P3
+DQM4HEP is distributed under the [GPLv3 License](http://www.gnu.org/licenses/gpl-3.0.en.html)
+
+[![License](https://www.gnu.org/graphics/gplv3-127x51.png)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ## INSTALL:
 
@@ -86,6 +89,11 @@ make -jN
 ```
 
 ### Known bugs
+
+#### When compiling DQM4ILC
+Some combination of ilcutil and gcc version produces error with the default CXX_FLAGS from ilcutil.
+This was resolved in commit https://github.com/iLCSoft/iLCUtil/commit/2c9d897bff08f7e98f4c68dee4f5bc57c8df97e9.
+Either use ilcutil v01-05 (not shipped as of this writing) or replace the `cmakemodules/ilcsoft_default_cxx_flags.cmake` file from your ilcutil folder by the one associtaed with commit https://github.com/iLCSoft/iLCUtil/commit/2c9d897bff08f7e98f4c68dee4f5bc57c8df97e9.
 
 #### On MAC-OSX:
 if you encounter this error when compiling did (dim sub-package) :

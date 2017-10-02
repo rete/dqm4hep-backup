@@ -100,23 +100,18 @@ SET( JsonCpp_additional_cmake_args ${JsonCpp_additional_cmake_args} -DJSONCPP_WI
 # ----- CLANG 7.0+ gives an error for #define private public -----
 # ----- error: keyword is hidden by macro definition [-Werror,-Wkeyword-macro] -----
 # ----- Also complains about multi-line // comment [-Werror,-Wcomment]
-# ----- Also complains about unusedParameter (found in Marlin package) [-Werror,-Wunused-parameter]
-IF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  SET( DQMCore_additional_cmake_args
-    ${DQMCore_additional_cmake_args}
-    "-DCMAKE_CXX_FLAGS=-Wno-keyword-macro -Wno-comment"
-	)
+# --- Errors also on Travis CI
 SET( levbdim_additional_cmake_args
-    ${levbdim_additional_cmake_args}
-    "-DCMAKE_CXX_FLAGS= -Wno-macro-redefined -Wno-format"
+  ${levbdim_additional_cmake_args}
+  "-DCMAKE_CXX_FLAGS= -Wno-macro-redefined -Wno-format"
   )
+
+# ----- DQM4ILC complains about unusedParameter and shadow (found in Marlin package) [-Werror,-Wunused-parameter -Wshadow]
+# ----- Also complains about effc++ warning from xdrstream : need to be taken care off in a future release
 SET( DQM4ILC_additional_cmake_args
-    ${DQM4ILC_additional_cmake_args}
-     "-DCMAKE_CXX_FLAGS=-Wno-unused-parameter"
-    )
-
-ENDIF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-
+  ${DQM4ILC_additional_cmake_args}
+  "-DCMAKE_CXX_FLAGS= -Wno-unused-parameter -Wno-shadow -Wno-effc++"
+  )
 
 # ----- dim os detection -----
 IF( APPLE )
@@ -156,6 +151,12 @@ SET( common_cmake_args
 )
 
 # ----- package options -----------------------------------------------------------------------
+OPTION(BUILD_OFFLINE "Build offline" OFF)
+IF (BUILD_OFFLINE)
+  MESSAGE( WARNING "Building framework offline - No update will be performed !")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR}
+                 PROPERTY EP_UPDATE_DISCONNECTED 1)
+ENDIF()
 
 OPTION( BUILD_DQMVIZ "Build DQMViz library and binaries (requires Qt and ROOT built with Qt support (--enable-qt))" OFF )
 MESSAGE( STATUS "BUILD_DQMVIZ: ${BUILD_DQMVIZ}" )
@@ -350,6 +351,31 @@ SET( levbdim_additional_cmake_args
     ${levbdim_additional_cmake_args}
     -DDIMDIR=${DIMDIR}
   )
+
+IF ( LCIO_DIR )
+  SET( xdrlcio_additional_cmake_args
+    ${xdrlcio_additional_cmake_args}
+    -DLCIO_DIR=${LCIO_DIR}
+    )
+
+  SET( DQM4ILC_additional_cmake_args
+    ${DQM4ILC_additional_cmake_args}
+    -DLCIO_DIR=${LCIO_DIR}
+    )
+ENDIF()
+
+
+IF ( BUILD_DQM4ILC )
+    SET (DQM4ILC_DEP Marlin GEAR)
+    FOREACH (DEP ${DQM4ILC_DEP})
+      IF (${DEP}_DIR)
+	SET( DQM4ILC_additional_cmake_args
+	  ${DQM4ILC_additional_cmake_args}
+	  -D${DEP}_DIR=${${DEP}_DIR}
+	  )
+      ENDIF()
+    ENDFOREACH()
+ENDIF()
 
 # ----- JsonCpp package -----
 FIND_PACKAGE( JSONCPP QUIET )
